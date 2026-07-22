@@ -1,0 +1,12 @@
+{
+  "name": "CutQuote — Lawn, Snow & Leaf Pricing",
+  "short_name": "CutQuote",
+  "description": "Address-to-address pricing for mowing, snow removal, and leaf cleanup. Time, mileage, and fuel with the math showing.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#DEDBCE",
+  "theme_color": "#1E241C",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

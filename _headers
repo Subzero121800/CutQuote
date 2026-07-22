@@ -1,0 +1,6 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://geocoding.geo.census.gov; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://nominatim.openstreetmap.org https://router.project-osrm.org https://app.regrid.com; img-src 'self' data: https://server.arcgisonline.com https://basemap.nationalmap.gov; base-uri 'self'; frame-ancestors 'none'

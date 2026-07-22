@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CutQuote — Lawn, Snow &amp; Leaf Pricing</title>
+<meta name="description" content="Address-to-address pricing for mowing, snow removal, and leaf cleanup. Time, mileage, and fuel with the math showing." />
+<meta property="og:title" content="CutQuote — Lawn, Snow & Leaf Pricing" />
+<meta property="og:description" content="Address-to-address pricing for mowing, snow removal, and leaf cleanup. Time, mileage, and fuel with the math showing." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#1E241C" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-mode="homeowner" data-svc="lawn">
+<div class="wrap">
+
+  <header class="mast">
+    <div>
+      <div class="logo">CUT<span class="ax" id="logoAx">QUOTE</span></div>
+      <div class="tag">Address-to-address pricing for lawn, snow, and leaf work. Time, mileage, and fuel, with the math showing.</div>
+    </div>
+    <div class="mastright">
+      <a class="bmc bmc-sm" href="https://buymeacoffee.com/jcinc" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+      <div class="modeswitch" role="tablist" aria-label="Mode">
+        <button id="mHome" class="on" role="tab" aria-selected="true">HOMEOWNER</button>
+        <button id="mOp" role="tab" aria-selected="false">OWNER / OPERATOR</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="svctabs" role="tablist" aria-label="Service">
+    <button id="tLawn" class="on" role="tab" aria-selected="true"><span class="dot" style="background:#3E7A3A"></span>LAWN MOWING</button>
+    <button id="tSnow" role="tab" aria-selected="false"><span class="dot" style="background:#2E7FA8"></span>SNOW REMOVAL</button>
+    <button id="tLeaf" role="tab" aria-selected="false"><span class="dot" style="background:#B0722A"></span>LEAF CLEANUP</button>
+  </div>
+
+  <div class="grid">
+    <div class="leftcol"><!-- LEFT: inputs -->
+
+      <!-- ROUTE -->
+      <section class="panel">
+        <div class="lbl" id="routeLbl">Route: how far is the crew coming?</div>
+        <div class="addrgrid">
+          <div class="fld"><input type="text" id="baseAddr" placeholder="Contractor town or address (optional)" autocomplete="street-address"></div>
+          <div class="fld"><input type="text" id="jobAddr" placeholder="Job address (e.g. 612 Cemetery Rd, Perryopolis, PA)" autocomplete="street-address"></div>
+        </div>
+        <div class="row rowmid">
+          <button class="btn" id="routeBtn">CALCULATE ROUTE</button>
+          <span class="routeok" id="routeOut"></span>
+          <label class="check pushright"><input type="checkbox" id="useManual"> enter manually</label>
+        </div>
+        <div id="routeErr" class="warn hidden" role="alert"></div>
+        <div class="row rowmid" id="manualRow">
+          <div class="fld"><div class="lbl">One-way miles</div><input type="number" id="manMiles" value="8" step="0.5" min="0"></div>
+          <div class="fld"><div class="lbl">One-way drive minutes</div><input type="number" id="manMins" value="15" min="0"></div>
+        </div>
+      </section>
+
+      <!-- LAWN PROPERTY -->
+      <section class="panel svc-lawn">
+        <div class="lbl">The lawn</div>
+        <div class="row">
+          <div class="fld">
+            <div class="lbl">Lot size (acres)</div>
+            <div class="sliderrow">
+              <input type="range" id="acresR" min="0.1" max="5" step="0.05" value="1" aria-label="Lot size in acres">
+              <input type="number" id="acres" value="1" step="0.05" min="0.05" class="w80">
+              <button class="btn measbtn" id="measOpenLawn" type="button" title="Measure from aerial imagery">📐 MEASURE</button>
+            </div>
+          </div>
+          <div class="fld"><div class="lbl">% actually mowable</div><input type="number" id="mowablePct" value="85" min="10" max="100" class="w76"><span class="suffix">%</span></div>
+        </div>
+        <div class="row rowmid">
+          <div class="fld"><div class="lbl">Terrain</div><div class="seg" id="segTerrain"></div></div>
+          <div class="fld"><div class="lbl">Obstacles</div><div class="seg" id="segObstacles"></div></div>
+        </div>
+        <div class="row rowmid">
+          <div class="fld"><div class="lbl">Cut frequency</div><div class="seg" id="segFreq"></div></div>
+          <div class="fld"><div class="lbl">Equipment</div><select id="mower"></select></div>
+        </div>
+      </section>
+
+      <!-- SNOW PROPERTY -->
+      <section class="panel svc-snow hidden">
+        <div class="lbl">The job</div>
+        <div class="row">
+          <div class="fld"><div class="lbl">Driveway area</div><input type="number" id="driveSqft" value="800" step="50" min="0"><span class="suffix">sq ft</span> <button class="btn measbtn" id="measOpenSnow" type="button" title="Measure from aerial imagery">📐 MEASURE</button></div>
+          <div class="fld"><div class="lbl">Quick presets</div><div class="seg" id="segDrivePreset"></div></div>
+        </div>
+        <div class="row rowmid">
+          <div class="fld"><div class="lbl">Sidewalk / walkway</div><input type="number" id="walkFt" value="40" step="10" min="0"><span class="suffix">linear ft</span></div>
+          <div class="fld"><div class="lbl">Snow depth</div><div class="seg" id="segDepth"></div></div>
+        </div>
+        <div class="row rowmid">
+          <div class="fld"><div class="lbl">Equipment</div><select id="snowEquip"></select></div>
+          <div class="fld"><div class="lbl">Expected events / season</div><input type="number" id="events" value="12" min="1" class="w70"></div>
+        </div>
+        <div class="row rowmid">
+          <label class="check"><input type="checkbox" id="salting" checked> Salt / ice melt application</label>
+          <div class="fld" id="bagFld"><div class="lbl">Ice melt price (50 lb bag)</div><input type="number" id="bagPrice" value="9" step="0.5" min="0"><span class="suffix">$</span></div>
+          <label class="check"><input type="checkbox" id="priority"> Priority clear (done before 6 AM) +25%</label>
+        </div>
+      </section>
+
+      <!-- LEAF PROPERTY -->
+      <section class="panel svc-leaf hidden">
+        <div class="lbl">The job</div>
+        <div class="row">
+          <div class="fld">
+            <div class="lbl">Lot size (acres)</div>
+            <div class="sliderrow">
+              <input type="range" id="lacresR" min="0.1" max="5" step="0.05" value="1" aria-label="Lot size in acres">
+              <input type="number" id="lacres" value="1" step="0.05" min="0.05" class="w80">
+              <button class="btn measbtn" id="measOpenLeaf" type="button" title="Measure from aerial imagery">📐 MEASURE</button>
+            </div>
+          </div>
+          <div class="fld"><div class="lbl">Tree cover</div><div class="seg" id="segTree"></div></div>
+        </div>
+        <div class="row rowmid">
+          <label class="check"><input type="checkbox" id="haul" checked> Haul away debris</label>
+          <div class="fld" id="dumpFld"><div class="lbl">Dump fee per load</div><input type="number" id="dumpFee" value="45" step="5" min="0"><span class="suffix">$</span></div>
+        </div>
+      </section>
+
+      <!-- TIME SETTINGS -->
+      <section class="panel">
+        <div class="lbl">Time settings</div>
+        <div class="row">
+          <div class="fld svc-lawn"><div class="lbl">Trim + edge + blow (min)</div><input type="number" id="trimMins" value="20" min="0"></div>
+          <div class="fld svc-snow hidden"><div class="lbl">Detail work: steps, mailbox (min)</div><input type="number" id="detailMins" value="10" min="0"></div>
+          <div class="fld"><div class="lbl">Load / unload (min)</div><input type="number" id="loadMins" value="10" min="0"></div>
+        </div>
+      </section>
+
+      <!-- FUEL & MILEAGE -->
+      <section class="panel">
+        <div class="lbl">Fuel &amp; mileage settings</div>
+        <div class="row">
+          <div class="fld"><div class="lbl">Fuel price</div><input type="number" id="fuel" value="3.45" step="0.05" min="0" class="w80"><span class="suffix">$/gal</span></div>
+          <div class="fld"><div class="lbl">Truck MPG</div><input type="number" id="mpg" value="12" min="1" class="w70"></div>
+          <div class="fld mode-op hidden"><div class="lbl">Drive time billed at</div><input type="number" id="drivePct" value="50" min="0" max="100" class="w70"><span class="suffix">% of labor rate</span></div>
+        </div>
+      </section>
+
+      <!-- OPERATOR ECONOMICS -->
+      <section class="panel hot mode-op hidden">
+        <div class="lbl">Operator economics</div>
+        <div class="row">
+          <div class="fld"><div class="lbl">Crew size</div><input type="number" id="crew" value="1" min="1" class="w64"></div>
+          <div class="fld"><div class="lbl">Labor rate / person</div><input type="number" id="laborRate" value="40" min="1" class="w80"><span class="suffix">$/hr</span></div>
+          <div class="fld"><div class="lbl">Overhead + margin</div><input type="number" id="margin" value="15" min="0" class="w70"><span class="suffix">%</span></div>
+          <div class="fld"><div class="lbl">Minimum charge</div><input type="number" id="minCharge" value="55" min="0" class="w80"><span class="suffix">$</span></div>
+        </div>
+      </section>
+
+      <div class="resetline">Inputs are saved on this device automatically. <button id="resetBtn" type="button">Reset everything to defaults</button></div>
+
+    </div>
+
+    <!-- RIGHT: ticket -->
+    <div class="ticketwrap">
+      <div class="ticket" id="ticket" aria-live="polite"></div>
+      <div class="tactions">
+        <button class="btn" id="printBtn" type="button">PRINT / SAVE PDF</button>
+        <button class="btn ghost" id="copyBtn" type="button">COPY QUOTE</button>
+      </div>
+      <div class="tactions mode-op hidden">
+        <button class="btn" id="signBtn" type="button">✍ SIGN CONTRACT ON THIS PHONE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <section class="support">
+    <div>
+      <div class="support-t">CutQuote is free to use</div>
+      <div class="support-s">No accounts, no ads, no tracking. If it helped you win a job — or dodge a bad quote — you can toss a coffee in the tip jar.</div>
+    </div>
+    <a class="bmc" href="https://buymeacoffee.com/jcinc" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+  </section>
+
+  <footer class="sitefoot">
+    <div>Estimates only — always verify lot size and driveway area against the county parcel record.<br>Routing &amp; geocoding © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, via Nominatim and OSRM.</div>
+    <div>Built by Joseph C McGinty Jr // ResilientMind AI ©2026 · <a href="https://buymeacoffee.com/jcinc" target="_blank" rel="noopener">Support this project</a></div>
+  </footer>
+</div>
+
+<!-- MEASURE-FROM-THE-SKY MODAL -->
+<div class="measmask hidden" id="measMask">
+  <div class="measmodal" role="dialog" aria-modal="true" aria-label="Measure area from aerial imagery">
+    <div class="meashead">
+      <span class="meastitle">📐 MEASURE FROM THE SKY</span>
+      <button class="btn ghost" id="measClose" type="button">CLOSE ✕</button>
+    </div>
+    <div class="measaddrrow">
+      <input type="text" id="measAddr" placeholder="Job address to fly to">
+      <button class="btn" id="measLocate" type="button">LOCATE</button>
+    </div>
+    <div id="measStatus" class="warn hidden"></div>
+    <div class="measbody">
+      <div class="measmapwrap">
+        <div class="measmap" id="measMap">
+          <div class="measempty" id="measEmpty">Enter the job address above and hit LOCATE.</div>
+        </div>
+        <div class="measzoom">
+          <button id="measZin" type="button" aria-label="Zoom in">+</button>
+          <button id="measZout" type="button" aria-label="Zoom out">−</button>
+        </div>
+      </div>
+      <div class="measside">
+        <div class="lbl">How to measure</div>
+        <div class="meashelp">Tap the corners of the lawn (or driveway) to outline it. Drag to pan. The shape closes itself.</div>
+        <div class="measreadout" id="measReadout"><span class="mono">0.00</span> ac · <span class="mono">0</span> sq ft</div>
+        <div class="meashint">Tip: if you trace just the grass, set “% actually mowable” to 100.</div>
+        <div class="measbtns">
+          <button class="btn ghost" id="measUndo" type="button">UNDO POINT</button>
+          <button class="btn ghost" id="measClear" type="button">CLEAR</button>
+        </div>
+        <div class="measbtns">
+          <button class="btn" id="measUseLawn" type="button">USE FOR LAWN</button>
+          <button class="btn" id="measUseLeaf" type="button">USE FOR LEAF</button>
+          <button class="btn" id="measUseDrive" type="button">USE FOR DRIVEWAY</button>
+        </div>
+        <div class="measparcel">
+          <div class="lbl">Parcel record lookup (optional)</div>
+          <div class="meashelp">County-recorded lot size by address. Needs your own free <a href="https://regrid.com" target="_blank" rel="noopener">Regrid</a> API token — saved only on this device.</div>
+          <div class="measbtns">
+            <input type="text" id="regridToken" placeholder="Regrid API token">
+            <button class="btn" id="regridGo" type="button">LOOKUP</button>
+          </div>
+          <div id="regridOut" class="meashelp"></div>
+        </div>
+      </div>
+    </div>
+    <div class="measfine">Imagery © Esri — Maxar, Earthstar Geographics, USDA, USGS, and the GIS User Community. Fallback imagery: USGS. Measurements are estimates.</div>
+  </div>
+</div>
+
+<!-- CONTRACT & SIGNATURE MODAL -->
+<div class="sigmask hidden" id="sigMask">
+  <div class="sigmodal">
+    <div class="meashead noprint">
+      <span class="meastitle">✍ CONTRACT &amp; SIGNATURES</span>
+      <button class="btn ghost" id="sigClose" type="button">CLOSE ✕</button>
+    </div>
+    <div class="contract" id="contractSheet" role="dialog" aria-modal="true" aria-label="Service agreement and signatures">
+      <div class="c-head">
+        <span class="c-biz" id="cBizOut">Your Business Name</span>
+        <span class="c-kind">SERVICE AGREEMENT · <span id="cDate"></span> · NO. <span id="cNo"></span></span>
+      </div>
+      <div class="c-fields noprint">
+        <div class="fld"><div class="lbl">Your business name</div><input type="text" id="bizName" placeholder="e.g. McGinty Lawn &amp; Snow"></div>
+        <div class="fld"><div class="lbl">Customer name</div><input type="text" id="custName" placeholder="Customer full name"></div>
+        <div class="fld fullrow"><div class="lbl">Service address</div><input type="text" id="custAddr" placeholder="Job address"></div>
+      </div>
+      <div class="c-addr" id="cAddrOut"></div>
+      <div class="c-billing noprint">
+        <div class="lbl">Billing</div>
+        <div class="seg" id="segBilling"></div>
+        <div class="row rowmid hidden" id="prepayOpts">
+          <div class="fld" id="prepayNFld"><div class="lbl">Visits in advance</div><input type="number" id="prepayN" value="4" min="2" class="w64" aria-label="Number of visits billed in advance"></div>
+          <div class="fld"><div class="lbl">Prepay discount</div><input type="number" id="prepayDisc" value="5" min="0" max="50" class="w64" aria-label="Prepay discount percent"><span class="suffix">%</span></div>
+        </div>
+      </div>
+      <div class="c-summary" id="contractBody"></div>
+      <div class="lbl">Terms <span class="noprint">(tap to edit)</span></div>
+      <div class="c-terms" id="contractTerms" contenteditable="true"></div>
+      <div class="sigrow">
+        <div class="sigblock">
+          <div class="lbl">Contractor signature</div>
+          <canvas class="sigpad" id="padOp"></canvas>
+          <div class="sigline"><span class="mono signame-out" id="cBizLine"></span><span class="printonly sigdate" id="cSigD1"></span><button class="sigclear noprint" id="clearOp" type="button">clear</button></div>
+        </div>
+        <div class="sigblock">
+          <div class="lbl">Customer signature</div>
+          <canvas class="sigpad" id="padCust"></canvas>
+          <div class="sigline"><span class="mono signame-out" id="cCustLine"></span><span class="printonly sigdate" id="cSigD2"></span><button class="sigclear noprint" id="clearCust" type="button">clear</button></div>
+        </div>
+      </div>
+      <div class="c-date">Signed on-site · <span id="cDate2"></span> · Generated with CutQuote</div>
+    </div>
+    <div class="sigactions noprint">
+      <button class="btn" id="sigPrint" type="button">PRINT / SAVE PDF CONTRACT</button>
+      <span class="meashelp selfcenter">Hand the phone to the customer to sign, then save the PDF and text or email it to them. In the print dialog, turn off “Headers and footers” for a clean sheet.</span>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js" defer></script>
+</body>
+</html>
